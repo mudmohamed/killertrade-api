@@ -1,0 +1,1 @@
+How to connect Stripe for license payments.

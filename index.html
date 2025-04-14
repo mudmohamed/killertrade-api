@@ -1,0 +1,83 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Killer Trade Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body { font-family: Arial; background: #f4f4f4; color: #333; margin: 30px; }
+    h2 { color: #222; }
+    .tab-btn { padding: 10px 15px; margin-right: 10px; background: #007bff; color: #fff; border: none; cursor: pointer; }
+    .trade-box { margin: 10px 0; padding: 10px; background: #fff; border-left: 4px solid #007bff; }
+    .profit { border-left-color: green; }
+    .loss { border-left-color: red; }
+    button.green { background-color: green; color: white; }
+    button.red { background-color: red; color: white; }
+  </style>
+</head>
+<body>
+  <h2>Killer Trade Admin Dashboard</h2>
+
+  <button class="tab-btn">Dashboard</button>
+  <button class="tab-btn">License</button>
+  <button class="tab-btn">Settings</button>
+
+  <h3>Account Balance:</h3>
+  <p id="balance">Loading...</p>
+
+  <h3>Recent Trades:</h3>
+  <div id="trades">Loading...</div>
+
+  <h3>Bot Status:</h3>
+  <p id="status">Checking...</p>
+
+  <h3>Trading Control:</h3>
+  <button class="green" onclick="startTrading()">Start Trading</button>
+  <button class="red" onclick="stopTrading()">Stop Trading</button>
+
+  <h3>Payment:</h3>
+  <button>$90 Monthly</button>
+  <button>$300 Lifetime</button>
+  <p style="font-size: 0.8em;">Secure payment powered by Stripe</p>
+
+  <script>
+    function fetchData() {
+      fetch('http://localhost:3000/api/data')
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('balance').textContent = `$${data.accountBalance.toFixed(2)}`;
+          document.getElementById('status').textContent = data.botStatus;
+
+          const trades = document.getElementById('trades');
+          trades.innerHTML = '';
+          data.recentTrades.forEach(trade => {
+            const div = document.createElement('div');
+            div.className = 'trade-box ' + (trade.profit >= 0 ? 'profit' : 'loss');
+            div.innerHTML = `<strong>${trade.symbol}</strong> - ${trade.action}<br>
+                             Profit/Loss: $${trade.profit}<br>
+                             Time: ${trade.time}`;
+            trades.appendChild(div);
+          });
+        })
+        .catch(err => console.error('Error loading data:', err));
+    }
+
+    function startTrading() {
+      fetch('http://localhost:3000/api/start', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => alert(data.status))
+        .catch(err => alert('Error: ' + err));
+    }
+
+    function stopTrading() {
+      fetch('http://localhost:3000/api/stop', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => alert(data.status))
+        .catch(err => alert('Error: ' + err));
+    }
+
+    fetchData();
+    setInterval(fetchData, 5000);
+  </script>
+</body>
+</html>

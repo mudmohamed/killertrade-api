@@ -1,0 +1,1 @@
+Instructions to link your Telegram bot with Killer Trade.
