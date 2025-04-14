@@ -1,3 +1,2 @@
 flask
-MetaTrader5
 requests
