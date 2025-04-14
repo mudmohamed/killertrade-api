@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Killer Trade Admin Dashboard</title>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: Arial; padding: 20px; background: #fff; }
+    h2 { color: #222; }
+    .tab-btn { padding: 10px 20px; background: #007bff; color: white; border: none; margin: 0 5px; }
+    .tab-btn:hover { background: #0056b3; }
+    .profit { color: green; }
+    .loss { color: red; }
+    .btn-start { background: green; color: white; padding: 8px; border: none; }
+    .btn-stop { background: red; color: white; padding: 8px; border: none; }
+  </style>
+</head>
+<body>
+  <h2>Killer Trade Admin Dashboard</h2>
+  <button class="tab-btn" onclick="showTab('dashboard')">Dashboard</button>
+  <button class="tab-btn" onclick="showTab('license')">License</button>
+  <button class="tab-btn" onclick="showTab('settings')">Settings</button>
+
+  <div id="dashboard">
+    <p><strong>Account Balance:</strong></p>
+    <p id="balance">$0.00</p>
+
+    <p><strong>Recent Trades:</strong></p>
+    <div id="trades"></div>
+
+    <p><strong>Bot Status:</strong></p>
+    <p id="botStatus">Unknown</p>
+
+    <p><strong>Trading Control:</strong></p>
+    <button class="btn-start" onclick="startTrading()">Start Trading</button>
+    <button class="btn-stop" onclick="stopTrading()">Stop Trading</button>
+
+    <p><strong>Payment:</strong></p>
+    <button onclick="window.open('https://buy.stripe.com/test_eVa6r7f5p93r8kMbII')">$50 Monthly</button>
+    <button onclick="window.open('https://buy.stripe.com/test_28o4jNgJ75BFaZa4gg')">$300 Lifetime</button>
+    <p>Secure payment powered by Stripe</p>
+  </div>
+
+  <div id="license" style="display:none;">
+    <h3>License Info</h3>
+    <p>ID: <span id="licenseId">-</span></p>
+    <p>Status: <span id="licenseStatus">-</span></p>
+  </div>
+
+  <div id="settings" style="display:none;">
+    <h3>Settings</h3>
+    <label>Risk Mode:</label>
+    <select id="riskMode">
+      <option value="auto">Auto Lot</option>
+      <option value="manual">Manual</option>
+    </select><br><br>
+    <label>Theme:</label>
+    <select id="themeSwitch">
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+    </select><br><br>
+    <label>Email:</label> <input type="email" value="admin@example.com"><br><br>
+    <label>ID:</label> <input type="text" value="123456"><br><br>
+    <label>Reset Password:</label> <input type="password" placeholder="New Password"><br><br>
+  </div>
+
+  <script>
+    function showTab(tab) {
+      document.getElementById("dashboard").style.display = tab === "dashboard" ? "block" : "none";
+      document.getElementById("license").style.display = tab === "license" ? "block" : "none";
+      document.getElementById("settings").style.display = tab === "settings" ? "block" : "none";
+    }
+
+    function fetchData() {
+      fetch('https://killertrade-api.onrender.com/api/status')
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("balance").innerText = `$${data.balance.toFixed(2)}`;
+          document.getElementById("botStatus").innerText = data.status;
+          const trades = document.getElementById("trades");
+          trades.innerHTML = "";
+          data.trades.forEach(trade => {
+            const div = document.createElement("div");
+            div.className = trade.profit >= 0 ? "profit" : "loss";
+            div.innerHTML = `${trade.symbol} - ${trade.action} <br> Profit/Loss: $${trade.profit} <br> Time: ${trade.time} <hr>`;
+            trades.appendChild(div);
+          });
+        })
+        .catch(err => console.error('Error loading data:', err));
+    }
+
+    function startTrading() {
+      fetch('https://killertrade-api.onrender.com/api/start', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => alert(data.status))
+        .catch(err => alert('Error: ' + err));
+    }
+
+    function stopTrading() {
+      fetch('https://killertrade-api.onrender.com/api/stop', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => alert(data.status))
+        .catch(err => alert('Error: ' + err));
+    }
+
+    fetchData();
+    setInterval(fetchData, 5000);
+  </script>
+</body>
+</html>
