@@ -21,3 +21,6 @@ def update_status():
 @app.route("/api", methods=["GET"])
 def get_status():
     return jsonify({"status": status, "balance": balance})
+
+if __name__ == "__main__":
+    app.run(debug=True)
