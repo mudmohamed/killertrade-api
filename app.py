@@ -21,7 +21,3 @@ def update_status():
 @app.route("/api", methods=["GET"])
 def get_status():
     return jsonify({"status": status, "balance": balance})
-
-# Only needed for local dev, not in Railway
-# if __name__ == "__main__":
-#     app.run(host="0.0.0.0", port=10000)
